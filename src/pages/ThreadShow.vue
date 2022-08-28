@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue';
-import sourceData from '@/data.json';
+import { useStore } from 'vuex';
 import PostList from '@/components/PostList';
 import PostEditor from '@/components/PostEditor';
+
+const store = useStore();
 
 const props = defineProps({
 	id: {
@@ -11,27 +13,25 @@ const props = defineProps({
 	},
 });
 
-const threads = ref(sourceData.threads);
-const posts = ref(sourceData.posts);
-const users = ref(sourceData.users);
 const newPostText = ref(null);
 
-const thread = computed(() => {
-	return threads.value.find(thread => thread.id === props.id);
-});
+const threads = computed(() => store.state.threads);
+const posts = computed(() => store.state.posts)
 
-const threadPosts = computed(() => {
-	return posts.value.filter(post => post.threadId === props.id);
-});
+const thread = computed(() =>
+	threads.value.find(thread => thread.id === props.id)
+);
+
+const threadPosts = computed(() =>
+	posts.value.filter(post => post.threadId === props.id)
+);
 
 const addPost = eventData => {
-	console.log(eventData);
 	const post = {
 		...eventData.post,
 		threadId: props.id,
 	};
-	posts.value.push(post);
-	thread.value.posts.push(post);
+	store.dispatch('createPost', post)
 };
 </script>
 

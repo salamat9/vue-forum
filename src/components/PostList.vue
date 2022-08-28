@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue';
-import sourceData from '@/data.json';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
 
 const props = defineProps({
 	posts: {
@@ -9,7 +11,7 @@ const props = defineProps({
 	},
 });
 
-const users = ref(sourceData.users);
+const users = computed(() => store.state.users);
 
 const userById = userId => {
 	return users.value.find(p => p.id === userId);

@@ -1,5 +1,7 @@
 <script setup>
-import sourceData from '@/data.json';
+import { useStore } from 'vuex';
+
+const store = useStore()
 
 const props = defineProps({
 	categories: {
@@ -9,7 +11,7 @@ const props = defineProps({
 });
 
 const getForumsForCategory = category => {
-	return sourceData.forums.filter(f => f.categoryId == category.id);
+	return store.state.forums.filter(f => f.categoryId == category.id);
 };
 </script>
 
@@ -18,7 +20,7 @@ const getForumsForCategory = category => {
 		v-for="category in categories"
 		:key="category.id"
 		:forums="getForumsForCategory(category)"
-    :title="category.name"
-    :categoryId="category.id"
+		:title="category.name"
+		:categoryId="category.id"
 	/>
 </template>

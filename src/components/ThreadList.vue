@@ -1,24 +1,21 @@
 <script setup>
-import { ref } from 'vue';
-import sourceData from '../data.json';
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
 
 const props = defineProps({
-  threads: {
-    type: Array,
-    required: true
-  }
-})
+	threads: {
+		type: Array,
+		required: true,
+	},
+});
 
-const posts = ref(sourceData.posts);
-const users = ref(sourceData.users);
+const posts = computed(() => store.state.posts)
+const users = computed(() => store.state.users)
 
-const postById = postId => {
-	return posts.value.find(p => p.id === postId);
-};
-
-const userById = userId => {
-	return users.value.find(p => p.id === userId);
-};
+const postById = postId => posts.value.find(p => p.id === postId);
+const userById = userId => users.value.find(p => p.id === userId);
 </script>
 
 <template>
@@ -29,18 +26,22 @@ const userById = userId => {
 			<div v-for="thread in props.threads" :key="thread.id" class="thread">
 				<div>
 					<p>
-						<router-link :to="{ name: 'ThreadShow', params: {id: thread.id}}">{{ thread.title }}</router-link>
+						<router-link
+							:to="{ name: 'ThreadShow', params: { id: thread.id } }"
+							>{{ thread.title }}</router-link
+						>
 					</p>
 					<p class="text-faded text-xsmall">
-						By <router-link :to="{}">{{ userById(thread.userId).name }}</router-link>
-            , <AppDate :timestamp="thread.publishedAt"/>.
+						By
+						<router-link :to="{}">{{
+							userById(thread.userId).name
+						}}</router-link>
+						, <AppDate :timestamp="thread.publishedAt" />.
 					</p>
 				</div>
 
 				<div class="activity">
-					<p class="replies-count">
-						{{ thread.posts.length }} replies
-					</p>
+					<p class="replies-count">{{ thread.posts.length }} replies</p>
 
 					<img
 						class="avatar-medium"
@@ -50,9 +51,11 @@ const userById = userId => {
 
 					<div>
 						<p class="text-xsmall">
-							<router-link :to="{}">{{ userById(thread.userId).name }}</router-link>
+							<router-link :to="{}">{{
+								userById(thread.userId).name
+							}}</router-link>
 						</p>
-						<AppDate :timestamp="thread.publishedAt"/>
+						<AppDate :timestamp="thread.publishedAt" />
 					</div>
 				</div>
 			</div>

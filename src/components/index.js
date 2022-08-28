@@ -2,6 +2,7 @@ import AppDate from '@/components/AppDate';
 import ThreadList from '@/components/ThreadList';
 import ForumList from '@/components/ForumList';
 import CategoryList from '@/components/CategoryList';
+import PostList from '@/components/PostList';
 
 export default [
 	{
@@ -16,8 +17,12 @@ export default [
 		name: 'ForumList',
 		component: ForumList,
 	},
-  {
+	{
 		name: 'CategoryList',
 		component: CategoryList,
+	},
+	{
+		name: 'PostList',
+		component: PostList,
 	},
 ];
