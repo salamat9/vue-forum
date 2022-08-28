@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue';
-import sourceData from '@/data.json';
+import { useStore } from 'vuex';
+
+const store = useStore();
 
 const props = defineProps({
 	id: {
@@ -10,11 +12,11 @@ const props = defineProps({
 });
 
 const category = computed(() =>
-	sourceData.categories.find(c => c.id == props.id)
+	store.state.categories.find(c => c.id == props.id)
 );
 
 const getForumsForCategory = category =>
-	sourceData.forums.filter(f => f.categoryId == category.id);
+	store.state.forums.filter(f => f.categoryId == category.id);
 </script>
 
 <template>
