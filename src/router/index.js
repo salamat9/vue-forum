@@ -51,6 +51,18 @@ const routes = [
 		},
 	},
 	{
+		path: '/forum/:forumId/thread/create',
+		name: 'ThreadCreate',
+		component: () => import('@/pages/ThreadCreate'),
+		props: true
+	},
+	{
+		path: '/thread/:id/edit',
+		name: 'ThreadEdit',
+		component: () => import('@/pages/ThreadEdit'),
+		props: true
+	},
+	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
 		component: () => import('@/components/PageNotFound'),
@@ -61,11 +73,11 @@ const router = createRouter({
 	history: createWebHistory(),
 	routes,
 	scrollBehavior(to) {
-		const scroll = {}
-		if (to.meta.toTop) scroll.top = 0
-		if (to.meta.smoothScroll) scroll.behavior = 'smooth'
-		return scroll
-	}
+		const scroll = {};
+		if (to.meta.toTop) scroll.top = 0;
+		if (to.meta.smoothScroll) scroll.behavior = 'smooth';
+		return scroll;
+	},
 });
 
 export default router;

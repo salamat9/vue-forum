@@ -42,13 +42,46 @@ export default createStore({
 				threadId: post.threadId,
 			});
 		},
+		async createThread({ commit, state, dispatch }, { title, text, forumId }) {
+			const id = 'gggg' + Math.random();
+			const userId = state.authId;
+			const publishedAt = Math.floor(Date.now() / 1000);
+			const thread = { forumId, title, publishedAt, userId, id };
+			commit('setThread', { thread });
+			commit('appendThreadToUser', { userId, threadId: id });
+			commit('appendThreadToForum', { forumId, threadId: id });
+			dispatch('createPost', { text, threadId: id });
+			return state.threads.find(t => t.id == id);
+		},
+		async updateThread({ commit, state }, { title, text, id }) {
+			const thread = state.threads.find(t => t.id === id);
+			const post = state.posts.find(p => p.id === thread.posts[0]);
+			const newThread = { ...thread, title };
+			const newPost = { ...post, text };
+			commit('setThread', { thread: newThread });
+			commit('setPost', { post: newPost });
+			return newThread
+		},
 		updateUser(context, user) {
 			context.commit('setUser', { user, userId: user.id });
 		},
 	},
 	mutations: {
 		setPost(state, { post }) {
-			state.posts.push(post);
+			const index = state.posts.findIndex(p => p.id === post.id);
+			if (post.id && index !== -1) {
+				state.posts[index] = post;
+			} else {
+				state.posts.push(post);
+			}
+		},
+		setThread(state, { thread }) {
+			const index = state.threads.findIndex((t => t.id === thread.id));
+			if (thread.id && index !== -1) {
+				state.threads[index] = thread;
+			} else {
+				state.threads.push(thread);
+			}
 		},
 		setUser(state, { user, userId }) {
 			const userIndex = state.users.findIndex(user => user.id === userId);
@@ -56,7 +89,18 @@ export default createStore({
 		},
 		appendPostToThread(state, { postId, threadId }) {
 			const thread = state.threads.find(t => t.id == threadId);
+			thread.posts = thread.posts || [];
 			thread.posts.push(postId);
+		},
+		appendThreadToForum(state, { forumId, threadId }) {
+			const forum = state.forums.find(f => f.id == forumId);
+			forum.threads = forum.threads || [];
+			forum.threads.push(threadId);
+		},
+		appendThreadToUser(state, { userId, threadId }) {
+			const user = state.users.find(u => u.id == userId);
+			user.threads = user.threads || [];
+			user.threads.push(threadId);
 		},
 	},
 });
