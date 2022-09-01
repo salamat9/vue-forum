@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { findById } from '../helpers';
 
 const store = useStore();
 
@@ -14,8 +15,8 @@ const props = defineProps({
 const posts = computed(() => store.state.posts)
 const users = computed(() => store.state.users)
 
-const postById = postId => posts.value.find(p => p.id === postId);
-const userById = userId => users.value.find(p => p.id === userId);
+const postById = postId => findById(posts.value, postId)
+const userById = userId => findById(users.value, userId)
 </script>
 
 <template>
@@ -41,7 +42,7 @@ const userById = userId => users.value.find(p => p.id === userId);
 				</div>
 
 				<div class="activity">
-					<p class="replies-count">{{ thread.posts.length }} replies</p>
+					<p class="replies-count">{{ thread.repliesCount }} replies</p>
 
 					<img
 						class="avatar-medium"

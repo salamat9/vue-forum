@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import ThreadEditor from '@/components/ThreadEditor';
+import { findById } from '../helpers';
 
 const store = useStore();
 const router = useRouter();
@@ -14,9 +15,7 @@ const props = defineProps({
 	},
 });
 
-const forum = computed(() =>
-	store.state.forums.find(f => f.id === props.forumId)
-);
+const forum = computed(() => findById(store.state.forums, props.forumId));
 
 const save = async ({ title, text }) => {
 	const thread = await store.dispatch('createThread', {

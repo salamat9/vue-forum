@@ -13,9 +13,7 @@ const props = defineProps({
 
 const users = computed(() => store.state.users);
 
-const userById = userId => {
-	return users.value.find(p => p.id === userId);
-};
+const userById = userId => store.getters.user(userId);
 </script>
 
 <template>
@@ -34,7 +32,12 @@ const userById = userId => {
 					/>
 				</a>
 
-				<p class="desktop-only text-small">107 posts</p>
+				<p class="desktop-only text-small">
+					{{ userById(post.userId).postsCount }}
+				</p>
+				<p class="desktop-only text-small">
+					{{ userById(post.userId).threadsCount }}
+				</p>
 			</div>
 
 			<div class="post-content">

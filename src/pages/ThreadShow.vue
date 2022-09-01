@@ -16,11 +16,9 @@ const props = defineProps({
 const newPostText = ref(null);
 
 const threads = computed(() => store.state.threads);
-const posts = computed(() => store.state.posts)
+const posts = computed(() => store.state.posts);
 
-const thread = computed(() =>
-	threads.value.find(thread => thread.id === props.id)
-);
+const thread = computed(() => store.getters.thread(props.id));
 
 const threadPosts = computed(() =>
 	posts.value.filter(post => post.threadId === props.id)
@@ -31,13 +29,32 @@ const addPost = eventData => {
 		...eventData.post,
 		threadId: props.id,
 	};
-	store.dispatch('createPost', post)
+	store.dispatch('createPost', post);
 };
 </script>
 
 <template>
 	<div class="col-large push-top">
-		<h1>{{ thread.title }}</h1>
+		<h1>
+			{{ thread.title }}
+			<router-link
+				:to="{ name: 'ThreadEdit', id: this.id }"
+				class="btn-green btn-small"
+				tag="button"
+			>
+				Edit Thread
+			</router-link>
+		</h1>
+		<p>
+			By <a href="#" class="link-unstyled">{{ thread.author.name }}</a>,
+			<AppDate :timestamp="thread.publishedAt" />.
+			<span
+				style="float: right; margin-top: 2px"
+				class="hide-mobile text-faded text-small"
+				>{{ thread.repliesCount }} replies by
+				{{ thread.contributorsCount }} contributors</span
+			>
+		</p>
 		<PostList :posts="threadPosts" />
 		<PostEditor @save="addPost" />
 	</div>

@@ -1,5 +1,6 @@
 import { createStore } from 'vuex';
 import sourceData from '@/data.json';
+import { findById, upsert } from '@/helpers';
 
 export default createStore({
 	state: {
@@ -7,27 +8,49 @@ export default createStore({
 		authId: 'u4r8XCziZEWEXsj2UIKNHBoDh0n2',
 	},
 	getters: {
-		authUser: state => {
-			const user = state.users.find(user => user.id == state.authId);
-			if (!user) return null;
-			return {
-				...user,
-				get posts() {
-					return state.posts.filter(post => post.userId == user.id);
-				},
-				get postsCount() {
-					const count = this.posts.length;
-					if (count == 1) return '1 post';
-					return `${count} posts`;
-				},
-				get threads() {
-					return state.threads.filter(t => t.userId == user.id);
-				},
-				get threadsCount() {
-					const count = this.threads.length;
-					if (count == 1) return '1 thread';
-					return `${count} threads`;
-				},
+		authUser: (state, getters) => {
+			return getters.user(state.authId)
+		},
+		user: state => {
+			return id => {
+				const user = findById(state.users, id);
+				if (!user) return null;
+				return {
+					...user,
+					get posts() {
+						return state.posts.filter(post => post.userId == user.id);
+					},
+					get postsCount() {
+						const count = this.posts.length;
+						if (count == 1) return '1 post';
+						return `${count} posts`;
+					},
+					get threads() {
+						return state.threads.filter(t => t.userId == user.id);
+					},
+					get threadsCount() {
+						const count = this.threads.length;
+						if (count == 1) return '1 thread';
+						return `${count} threads`;
+					},
+				};
+			};
+		},
+		thread: state => {
+			return id => {
+				const thread = findById(state.threads, id);
+				return {
+					...thread,
+					get author() {
+						return findById(state.users, thread.userId);
+					},
+					get repliesCount() {
+						return thread.posts.length - 1;
+					},
+					get contributorsCount() {
+						return thread.contributors?.length ?? 0;
+					},
+				};
 			};
 		},
 	},
@@ -38,8 +61,12 @@ export default createStore({
 			post.publishedAt = Math.floor(Date.now() / 1000);
 			commit('setPost', { post });
 			commit('appendPostToThread', {
-				postId: post.id,
-				threadId: post.threadId,
+				childId: post.id,
+				parentId: post.threadId,
+			});
+			commit('appendContributorToThread', {
+				childId: state.authId,
+				parentId: post.threadId,
 			});
 		},
 		async createThread({ commit, state, dispatch }, { title, text, forumId }) {
@@ -48,19 +75,19 @@ export default createStore({
 			const publishedAt = Math.floor(Date.now() / 1000);
 			const thread = { forumId, title, publishedAt, userId, id };
 			commit('setThread', { thread });
-			commit('appendThreadToUser', { userId, threadId: id });
-			commit('appendThreadToForum', { forumId, threadId: id });
+			commit('appendThreadToUser', { parentId: userId, childId: id });
+			commit('appendThreadToForum', { parentId: forumId, childId: id });
 			dispatch('createPost', { text, threadId: id });
-			return state.threads.find(t => t.id == id);
+			return findById(state.threads, id);
 		},
 		async updateThread({ commit, state }, { title, text, id }) {
-			const thread = state.threads.find(t => t.id === id);
-			const post = state.posts.find(p => p.id === thread.posts[0]);
+			const thread = findById(state.threads, id);
+			const post = findById(state.posts, thread.posts[0]);
 			const newThread = { ...thread, title };
 			const newPost = { ...post, text };
 			commit('setThread', { thread: newThread });
 			commit('setPost', { post: newPost });
-			return newThread
+			return newThread;
 		},
 		updateUser(context, user) {
 			context.commit('setUser', { user, userId: user.id });
@@ -68,39 +95,40 @@ export default createStore({
 	},
 	mutations: {
 		setPost(state, { post }) {
-			const index = state.posts.findIndex(p => p.id === post.id);
-			if (post.id && index !== -1) {
-				state.posts[index] = post;
-			} else {
-				state.posts.push(post);
-			}
+			upsert(state.posts, post);
 		},
 		setThread(state, { thread }) {
-			const index = state.threads.findIndex((t => t.id === thread.id));
-			if (thread.id && index !== -1) {
-				state.threads[index] = thread;
-			} else {
-				state.threads.push(thread);
-			}
+			upsert(state.threads, thread);
 		},
 		setUser(state, { user, userId }) {
 			const userIndex = state.users.findIndex(user => user.id === userId);
 			state.users[userIndex] = user;
 		},
-		appendPostToThread(state, { postId, threadId }) {
-			const thread = state.threads.find(t => t.id == threadId);
-			thread.posts = thread.posts || [];
-			thread.posts.push(postId);
-		},
-		appendThreadToForum(state, { forumId, threadId }) {
-			const forum = state.forums.find(f => f.id == forumId);
-			forum.threads = forum.threads || [];
-			forum.threads.push(threadId);
-		},
-		appendThreadToUser(state, { userId, threadId }) {
-			const user = state.users.find(u => u.id == userId);
-			user.threads = user.threads || [];
-			user.threads.push(threadId);
-		},
+		appendPostToThread: makeAppendChildToParentMutations({
+			parent: 'threads',
+			child: 'posts',
+		}),
+		appendThreadToForum: makeAppendChildToParentMutations({
+			parent: 'forums',
+			child: 'threads',
+		}),
+		appendThreadToUser: makeAppendChildToParentMutations({
+			parent: 'users',
+			child: 'threads',
+		}),
+		appendContributorToThread: makeAppendChildToParentMutations({
+			parent: 'thread',
+			child: 'contributors',
+		}),
 	},
 });
+
+function makeAppendChildToParentMutations({ parent, child }) {
+	return (state, { childId, parentId }) => {
+		const resource = findById(state[parent], parentId);
+		resource[child] = resource[child] || [];
+		if (!resource[child].includes(childId)) {
+			resource[child].push(childId);
+		}
+	};
+}

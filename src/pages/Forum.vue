@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { findById } from '@/helpers';
 
 const store = useStore();
 
@@ -12,10 +13,11 @@ const props = defineProps({
 });
 
 const forum = computed(() => {
-	return store.state.forums.find(f => f.id == props.id);
+	return findById(store.state.forums, props.id)
 });
 
 const threads = computed(() => {
+	return forum._value.threads.map(threadId => store.getters.thread(threadId))
 	return store.state.threads.filter(t => t.forumId == props.id);
 });
 </script>
