@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { findById } from '@/helpers';
 import sourceData from '@/data.json';
 
 const routes = [
@@ -37,9 +38,7 @@ const routes = [
 		component: () => import('@/pages/ThreadShow'),
 		props: true,
 		beforeEnter(to, from, next) {
-			const threadExists = sourceData.threads.find(
-				thread => thread.id === to.params.id
-			);
+			const threadExists = findById(sourceData.threads, to.params.id);
 			if (threadExists) return next();
 			else
 				return next({
@@ -49,6 +48,18 @@ const routes = [
 					hash: to.hash,
 				});
 		},
+	},
+	{
+		path: '/forum/:forumId/thread/create',
+		name: 'ThreadCreate',
+		component: () => import('@/pages/ThreadCreate'),
+		props: true,
+	},
+	{
+		path: '/thread/:id/edit',
+		name: 'ThreadEdit',
+		component: () => import('@/pages/ThreadEdit'),
+		props: true,
 	},
 	{
 		path: '/:pathMatch(.*)*',
@@ -61,11 +72,11 @@ const router = createRouter({
 	history: createWebHistory(),
 	routes,
 	scrollBehavior(to) {
-		const scroll = {}
-		if (to.meta.toTop) scroll.top = 0
-		if (to.meta.smoothScroll) scroll.behavior = 'smooth'
-		return scroll
-	}
+		const scroll = {};
+		if (to.meta.toTop) scroll.top = 0;
+		if (to.meta.smoothScroll) scroll.behavior = 'smooth';
+		return scroll;
+	},
 });
 
 export default router;

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { findById } from '../helpers';
 
 const store = useStore();
 
@@ -12,7 +13,7 @@ const props = defineProps({
 });
 
 const category = computed(() =>
-	store.state.categories.find(c => c.id == props.id)
+	findById(store.state.categories, props.id)
 );
 
 const getForumsForCategory = category =>

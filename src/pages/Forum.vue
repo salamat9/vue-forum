@@ -1,8 +1,9 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { findById } from '@/helpers';
 
-const store = useStore()
+const store = useStore();
 
 const props = defineProps({
 	id: {
@@ -12,10 +13,11 @@ const props = defineProps({
 });
 
 const forum = computed(() => {
-	return store.state.forums.find(f => f.id == props.id);
+	return findById(store.state.forums, props.id)
 });
 
 const threads = computed(() => {
+	return forum._value.threads.map(threadId => store.getters.thread(threadId))
 	return store.state.threads.filter(t => t.forumId == props.id);
 });
 </script>
@@ -36,7 +38,12 @@ const threads = computed(() => {
 					<h1>{{ forum.name }}</h1>
 					<p class="text-lead">{{ forum.description }}</p>
 				</div>
-				<a href="new-thread.html" class="btn-green btn-small">Start a thread</a>
+				<router-link
+					:to="{ name: 'ThreadCreate', params: { forumId: forum.id } }"
+					class="btn-green btn-small"
+				>
+					Start a thread
+				</router-link>
 			</div>
 		</div>
 
