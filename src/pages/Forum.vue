@@ -18,7 +18,6 @@ const forum = computed(() => {
 
 const threads = computed(() => {
 	return forum._value.threads.map(threadId => store.getters.thread(threadId))
-	return store.state.threads.filter(t => t.forumId == props.id);
 });
 </script>
 

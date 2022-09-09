@@ -1,10 +1,16 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 
-const authUser = computed(() => store.getters.authUser);
+const authUser = ref(null);
+
+onMounted(async () => {
+	authUser.value = await store.dispatch('fetchUser', {
+		id: store.state.authId,
+	});
+});
 </script>
 
 <template>
@@ -23,12 +29,12 @@ const authUser = computed(() => store.getters.authUser);
 		<!-- use .navbar-open to open nav -->
 		<nav class="navbar">
 			<ul>
-				<li class="navbar-user">
+				<li v-if="authUser" class="navbar-user">
 					<router-link :to="{ name: 'Profile' }">
 						<img
 							class="avatar-small"
-							:src="authUser?.avatar"
-							:alt="`${authUser?.name} profile picture`"
+							:src="authUser.avatar"
+							:alt="`${authUser.name} profile picture`"
 						/>
 						<span>
 							{{ authUser.name }}

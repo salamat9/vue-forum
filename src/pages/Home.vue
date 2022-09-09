@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
-const store = useStore()
+const store = useStore();
 
 const categories = computed(() => {
 	return store.state.categories;

@@ -29,7 +29,8 @@ const userById = userId => findById(users.value, userId)
 					<p>
 						<router-link
 							:to="{ name: 'ThreadShow', params: { id: thread.id } }"
-							>{{ thread.title }}</router-link
+						>
+							{{ thread.title }}</router-link
 						>
 					</p>
 					<p class="text-faded text-xsmall">

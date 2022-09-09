@@ -19,7 +19,7 @@ const userById = userId => store.getters.user(userId);
 <template>
 	<div class="post-list">
 		<div v-for="post in props.posts" :key="post.id" class="post">
-			<div class="user-info">
+			<div v-if="userById(post.userId)" class="user-info">
 				<a href="#" class="user-name">
 					{{ userById(post.userId).name }}
 				</a>

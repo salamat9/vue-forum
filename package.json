@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "dayjs": "^1.11.5",
+    "firebase": "^8.4.1",
+    "firestore-export-import": "^0.14.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.4",
     "vuex": "^4.0.2"

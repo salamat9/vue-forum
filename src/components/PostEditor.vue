@@ -15,6 +15,7 @@ const save = () => {
 	text.value = '';
 };
 </script>
+
 <template>
 	<div class="col-full">
 		<form @submit.prevent="save">
