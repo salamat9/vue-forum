@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import ThreadEditor from '@/components/ThreadEditor';
@@ -18,7 +18,8 @@ const props = defineProps({
 const thread = computed(() => findById(store.state.threads, props.id));
 
 const text = computed(() => {
-	return findById(store.state.posts, thread._value.posts[0]).text;
+	const post = findById(store.state.posts, thread._value.posts[0]);
+	return post ? post.text : '';
 });
 
 const save = async ({ title, text }) => {
@@ -33,10 +34,15 @@ const save = async ({ title, text }) => {
 const cancel = () => {
 	router.push({ name: 'Forum', params: { id: props.forumId } });
 };
+
+onMounted(async () => {
+	const thread = await store.dispatch('fetchThread', { id: props.id });
+	store.dispatch('fetchPost', { id: thread.posts[0] });
+});
 </script>
 
 <template>
-	<div class="col-full push-top">
+	<div v-if="thread && text" class="col-full push-top">
 		<h1>
 			Editing <i>{{ thread.title }}</i>
 		</h1>

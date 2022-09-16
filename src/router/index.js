@@ -37,17 +37,17 @@ const routes = [
 		name: 'ThreadShow',
 		component: () => import('@/pages/ThreadShow'),
 		props: true,
-		beforeEnter(to, from, next) {
-			const threadExists = findById(sourceData.threads, to.params.id);
-			if (threadExists) return next();
-			else
-				return next({
-					name: 'NotFound',
-					params: { pathMatch: to.path.substring(1).split('/') },
-					query: to.query,
-					hash: to.hash,
-				});
-		},
+		// beforeEnter(to, from, next) {
+		// 	const threadExists = findById(sourceData.threads, to.params.id);
+		// 	if (threadExists) return next();
+		// 	else
+		// 		return next({
+		// 			name: 'NotFound',
+		// 			params: { pathMatch: to.path.substring(1).split('/') },
+		// 			query: to.query,
+		// 			hash: to.hash,
+		// 		});
+		// },
 	},
 	{
 		path: '/forum/:forumId/thread/create',
@@ -64,7 +64,7 @@ const routes = [
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
-		component: () => import('@/components/PageNotFound'),
+		component: () => import('@/pages/NotFound'),
 	},
 ];
 

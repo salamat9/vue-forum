@@ -43,6 +43,7 @@ export default createStore({
 		thread: state => {
 			return id => {
 				const thread = findById(state.threads, id);
+				if (!thread) return {};
 				return {
 					...thread,
 					get author() {
@@ -96,15 +97,55 @@ export default createStore({
 		updateUser(context, user) {
 			context.commit('setItem', { resource: 'users', item: user });
 		},
+		fetchAllCategories({ commit }) {
+			return new Promise(resolve => {
+				firebase
+					.firestore()
+					.collection('categories')
+					.onSnapshot(querySnapshot => {
+						const categories = querySnapshot.docs.map(doc => {
+							const item = { id: doc.id, ...doc.data() };
+							commit('setItem', { resource: 'categories', item });
+							return item;
+						});
+						resolve(categories);
+					});
+			});
+		},
+		fetchCategory({ dispatch }, { id }) {
+			return dispatch('fetchItem', { id, resource: 'categories' });
+		},
+		fetchForum({ dispatch }, { id }) {
+			return dispatch('fetchItem', { id, resource: 'forums' });
+		},
 		fetchThread({ dispatch }, { id }) {
 			return dispatch('fetchItem', { id, resource: 'threads' });
-		},
-		fetchUser({ dispatch }, { id }) {
-			return dispatch('fetchItem', { id, resource: 'users' });
 		},
 		fetchPost({ dispatch }, { id }) {
 			return dispatch('fetchItem', { id, resource: 'posts' });
 		},
+		fetchUser({ dispatch }, { id }) {
+			return dispatch('fetchItem', { id, resource: 'users' });
+		},
+
+		fetchThreads({ dispatch }, { ids }) {
+			return dispatch('fetchItems', { resource: 'threads', ids });
+		},
+		fetchForums({ dispatch }, { ids }) {
+			return dispatch('fetchItems', { resource: 'forums', ids });
+		},
+		fetchPosts({ dispatch }, { ids }) {
+			return dispatch('fetchItems', { resource: 'posts', ids });
+		},
+		fetchUsers({ dispatch }, { ids }) {
+			return dispatch('fetchItems', { resource: 'users', ids });
+		},
+		fetchItems({ dispatch }, { ids, resource }) {
+			return Promise.all(
+				ids.map(id => dispatch('fetchItem', { id, resource }))
+			);
+		},
+
 		fetchItem({ state, commit }, { id, resource }) {
 			return new Promise(resolve => {
 				firebase
@@ -145,7 +186,14 @@ export default createStore({
 function makeAppendChildToParentMutations({ parent, child }) {
 	return (state, { childId, parentId }) => {
 		const resource = findById(state[parent], parentId);
+		if (!resource) {
+			console.warn(
+				`Appending ${child} ${childId} to ${parent} ${parentId} failed because the parent didn't exist`
+			);
+			return;
+		}
 		resource[child] = resource[child] || [];
+
 		if (!resource[child].includes(childId)) {
 			resource[child].push(childId);
 		}

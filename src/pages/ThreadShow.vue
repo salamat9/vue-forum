@@ -35,10 +35,10 @@ onMounted(async () => {
 	thread.value.author = await store.dispatch('fetchUser', {
 		id: thread.value.userId,
 	});
-	thread.value.posts.forEach(async postId => {
-		const post = await store.dispatch('fetchPost', { id: postId });
-		store.dispatch('fetchUser', { id: post.userId });
-	});
+
+	const posts = await store.dispatch('fetchPosts', { ids: thread.value.posts });
+	const users = posts.map(post => post.userId);
+	store.dispatch('fetchUsers', { ids: users });
 });
 </script>
 
@@ -56,7 +56,7 @@ onMounted(async () => {
 		</h1>
 		<p>
 			By <a href="#" class="link-unstyled">{{ thread?.author?.name }}</a
-			>, <AppDate :timestamp="thread?.publishedAt" />.
+			>, <AppDate v-if="thread" :timestamp="thread?.publishedAt" />.
 			<span
 				style="float: right; margin-top: 2px"
 				class="hide-mobile text-faded text-small"

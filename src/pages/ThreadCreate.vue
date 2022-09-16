@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import ThreadEditor from '@/components/ThreadEditor';
@@ -29,10 +29,14 @@ const save = async ({ title, text }) => {
 const cancel = () => {
 	router.push({ name: 'Forum', params: { id: props.forumId } });
 };
+
+onMounted(() => {
+	store.dispatch('fetchForum', { id: props.forumId })
+})
 </script>
 
 <template>
-	<div class="col-full push-top">
+	<div v-if="forum" class="col-full push-top">
 		<h1>
 			Create new thread in <i>{{ forum.name }}</i>
 		</h1>

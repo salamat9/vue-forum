@@ -16,7 +16,7 @@ const posts = computed(() => store.state.posts)
 const users = computed(() => store.state.users)
 
 const postById = postId => findById(posts.value, postId)
-const userById = userId => findById(users.value, userId)
+const userById = userId => findById(users.value, userId) || {}
 </script>
 
 <template>
@@ -27,7 +27,7 @@ const userById = userId => findById(users.value, userId)
 			<div v-for="thread in props.threads" :key="thread.id" class="thread">
 				<div>
 					<p>
-						<router-link
+						<router-link v-if="thread.id"
 							:to="{ name: 'ThreadShow', params: { id: thread.id } }"
 						>
 							{{ thread.title }}</router-link
@@ -35,7 +35,7 @@ const userById = userId => findById(users.value, userId)
 					</p>
 					<p class="text-faded text-xsmall">
 						By
-						<router-link :to="{}">{{
+						<router-link v-if="thread.id" :to="{}">{{
 							userById(thread.userId).name
 						}}</router-link>
 						, <AppDate :timestamp="thread.publishedAt" />.
@@ -53,7 +53,7 @@ const userById = userId => findById(users.value, userId)
 
 					<div>
 						<p class="text-xsmall">
-							<router-link :to="{}">{{
+							<router-link v-if="thread.id" :to="{}">{{
 								userById(thread.userId).name
 							}}</router-link>
 						</p>
