@@ -1,17 +1,21 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import PostList from '@/components/PostList';
 import PostEditor from '@/components/PostEditor';
 
 const store = useStore();
 
+const emit = defineEmits(['ready'])
 const props = defineProps({
 	id: {
 		required: true,
 		type: String,
 	},
 });
+
+const ready = ref(false)
 
 const newPostText = ref(null);
 
@@ -38,12 +42,15 @@ onMounted(async () => {
 
 	const posts = await store.dispatch('fetchPosts', { ids: thread.value.posts });
 	const users = posts.map(post => post.userId);
-	store.dispatch('fetchUsers', { ids: users });
+	await store.dispatch('fetchUsers', { ids: users });
+
+	ready.value = useAsyncDataStatus()
+	emit('ready')
 });
 </script>
 
 <template>
-	<div class="col-large push-top">
+	<div v-if="ready" class="col-large push-top">
 		<h1>
 			{{ thread?.title }}
 			<router-link

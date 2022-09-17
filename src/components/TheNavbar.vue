@@ -18,7 +18,6 @@ onMounted(async () => {
 		<router-link :to="{ name: 'Home' }" class="logo">
 			<img src="../assets/svg/vueschool-logo.svg" />
 		</router-link>
-
 		<div class="btn-hamburger">
 			<!-- use .btn-humburger-active to open the menu -->
 			<div class="top bar"></div>

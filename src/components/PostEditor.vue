@@ -1,18 +1,20 @@
 <script setup>
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 const emit = defineEmits(['save']);
+const props = defineProps({
+	post: {
+		type: Object,
+		default: () => ({ text: null }),
+	},
+});
 
-const text = ref(null);
+const postCopy = reactive({ ...props.post })
 
 const save = () => {
-	const post = {
-		text: text.value,
-	};
+	emit('save', { post: postCopy });
 
-	emit('save', { post });
-
-	text.value = '';
+	postCopy.text = '';
 };
 </script>
 
@@ -21,7 +23,7 @@ const save = () => {
 		<form @submit.prevent="save">
 			<div class="form-group">
 				<textarea
-					v-model.trim="text"
+					v-model.trim="postCopy.text"
 					name=""
 					id=""
 					cols="30"
@@ -30,7 +32,7 @@ const save = () => {
 				></textarea>
 			</div>
 			<div class="form-actions">
-				<button class="btn btn-blue">Submit post</button>
+				<button class="btn btn-blue">{{ post.id ? 'Update post' : 'Submit post'}}</button>
 			</div>
 		</form>
 	</div>

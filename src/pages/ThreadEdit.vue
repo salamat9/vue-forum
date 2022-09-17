@@ -1,19 +1,23 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import ThreadEditor from '@/components/ThreadEditor';
-import { findById } from '../helpers';
+import { findById } from '@/helpers';
 
 const store = useStore();
 const router = useRouter();
 
+const emit = defineEmits(['ready'])
 const props = defineProps({
 	id: {
 		required: true,
 		type: String,
 	},
 });
+
+const ready = ref(false)
 
 const thread = computed(() => findById(store.state.threads, props.id));
 
@@ -37,12 +41,14 @@ const cancel = () => {
 
 onMounted(async () => {
 	const thread = await store.dispatch('fetchThread', { id: props.id });
-	store.dispatch('fetchPost', { id: thread.posts[0] });
+	await store.dispatch('fetchPost', { id: thread.posts[0] });
+	ready.value = useAsyncDataStatus()
+	emit('ready')
 });
 </script>
 
 <template>
-	<div v-if="thread && text" class="col-full push-top">
+	<div v-if="ready" class="col-full push-top">
 		<h1>
 			Editing <i>{{ thread.title }}</i>
 		</h1>

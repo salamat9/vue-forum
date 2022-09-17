@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '@/store'
 import { findById } from '@/helpers';
 import sourceData from '@/data.json';
 
@@ -78,5 +79,9 @@ const router = createRouter({
 		return scroll;
 	},
 });
+
+router.beforeEach(() => {
+	store.dispatch('unsubscribeAllSnapshots')
+})
 
 export default router;

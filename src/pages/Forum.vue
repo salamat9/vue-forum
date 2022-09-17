@@ -1,16 +1,20 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import { findById } from '@/helpers';
 
 const store = useStore();
 
+const emit = defineEmits(['ready'])
 const props = defineProps({
 	id: {
 		required: true,
 		type: String,
 	},
 });
+
+const ready = ref(false)
 
 const forum = computed(() => {
 	return findById(store.state.forums, props.id);
@@ -24,11 +28,14 @@ const threads = computed(() => {
 onMounted(async () => {
 	const forum = await store.dispatch('fetchForum', { id: props.id });
 	const threads = await store.dispatch('fetchThreads', { ids: forum.threads });
-	store.dispatch('fetchUsers', { ids: threads.map(thread => thread.userId) });
+	await store.dispatch('fetchUsers', { ids: threads.map(thread => thread.userId) });
+	ready.value = useAsyncDataStatus()
+	emit('ready')
 });
 </script>
 
 <template>
+	<div v-if="ready" class="col-full">
 	<div v-if="forum" class="col-full push-top">
 		<ul class="breadcrumbs">
 			<li>
@@ -55,4 +62,5 @@ onMounted(async () => {
 	<div class="col-full push-top">
 		<ThreadList :threads="threads" />
 	</div>
+</div>
 </template>
