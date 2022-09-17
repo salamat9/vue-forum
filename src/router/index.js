@@ -63,6 +63,11 @@ const routes = [
 		props: true,
 	},
 	{
+		path: '/register',
+		name: 'Register',
+		component: () => import('@/pages/Register'),
+	},
+	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
 		component: () => import('@/pages/NotFound'),
