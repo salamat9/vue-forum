@@ -17,7 +17,7 @@ const form = reactive({
 });
 
 const register = async () => {
-	store.dispatch('createUser', this.form);
+  await store.dispatch('registerUserWithEmailAndPassword', form)
 	router.push({ name: 'Home' });
 };
 
