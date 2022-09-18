@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router';
 
 const emit = defineEmits(['ready']);
 
-const store = useStore()
-const router = useRouter()
+const store = useStore();
+const router = useRouter();
 
 const form = reactive({
 	name: '',
@@ -17,10 +17,14 @@ const form = reactive({
 });
 
 const register = async () => {
-  await store.dispatch('registerUserWithEmailAndPassword', form)
+	await store.dispatch('registerUserWithEmailAndPassword', form);
 	router.push({ name: 'Home' });
 };
 
+const registerWithGoogle = async () => {
+	await store.dispatch('signInWithGoogle');
+	router.push({name: 'Home' });
+};
 onMounted(() => {
 	emit('ready');
 });
@@ -82,7 +86,7 @@ onMounted(() => {
 				</div>
 			</form>
 			<div class="text-center push-top">
-				<button class="btn-red btn-xsmall">
+				<button @click="registerWithGoogle" class="btn-red btn-xsmall">
 					<i class="fa fa-google fa-btn"></i>Sign up with Google
 				</button>
 			</div>

@@ -7,10 +7,6 @@ const store = useStore();
 const authUser = ref(null);
 const userDropdownOpen = ref(false);
 
-const signOut = () => {
-	
-}
-
 onMounted(async () => {
 	setTimeout(() => {
 		authUser.value = store.state.user;
