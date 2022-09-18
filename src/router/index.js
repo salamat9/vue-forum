@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import store from '@/store'
+import store from '@/store';
 import { findById } from '@/helpers';
 import sourceData from '@/data.json';
 
@@ -68,6 +68,11 @@ const routes = [
 		component: () => import('@/pages/Register'),
 	},
 	{
+		path: '/signIn',
+		name: 'SignIn',
+		component: () => import('@/pages/SignIn'),
+	},
+	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
 		component: () => import('@/pages/NotFound'),
@@ -86,7 +91,7 @@ const router = createRouter({
 });
 
 router.beforeEach(() => {
-	store.dispatch('unsubscribeAllSnapshots')
-})
+	store.dispatch('unsubscribeAllSnapshots');
+});
 
 export default router;

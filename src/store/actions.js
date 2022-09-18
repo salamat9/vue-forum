@@ -165,6 +165,14 @@ export default {
 		const userId = firebase.auth().currentUser?.uid;
 		if (!userId) return;
 		dispatch('fetchItem', { id: userId, resource: 'users' });
+		firebase
+			.firestore()
+			.collection('users')
+			.doc(userId)
+			.onSnapshot(doc => {
+				const user = { ...doc.data(), id: doc.id };
+				commit('setUser', user);
+			});
 		commit('setAuthId', userId);
 	},
 

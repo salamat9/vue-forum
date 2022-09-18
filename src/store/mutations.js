@@ -5,6 +5,10 @@ export default {
 		upsert(state[resource], docToResource(item));
 	},
 
+	setUser(state, user) {
+		state.user = user
+	},
+
 	setAuthId(state, id) {
 		state.authId = id;
 	},
