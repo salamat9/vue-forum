@@ -13,13 +13,13 @@ const showPage = ref(false);
 onMounted(async () => {
 	NProgress.configure({
 		speed: 200,
-		showSpinner: false
-	})
+		showSpinner: false,
+	});
 	router.beforeEach(() => {
 		showPage.value = false;
 		NProgress.start();
 	});
-	await store.dispatch('fetchAuthUser', store.state.authId);
+	await store.dispatch('fetchAuthUser');
 });
 
 const onPageReady = () => {

@@ -161,8 +161,12 @@ export default {
 		dispatch('fetchItem', { id, resource: 'posts' }),
 	fetchUser: ({ dispatch }, { id }) =>
 		dispatch('fetchItem', { id, resource: 'users' }),
-	fetchAuthUser: ({ dispatch }, state) =>
-		dispatch('fetchItem', { id: state.authId, resource: 'users' }),
+	fetchAuthUser: ({ dispatch, commit }) => {
+		const userId = firebase.auth().currentUser?.uid;
+		if (!userId) return;
+		dispatch('fetchItem', { id: userId, resource: 'users' });
+		commit('setAuthId', userId);
+	},
 
 	fetchCategories: ({ dispatch }, { ids }) =>
 		dispatch('fetchItems', { resource: 'categories', ids }),

@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-	<div>
+	<div v-if="props.user">
 		<div class="profile-card">
 			<p class="text-center">
 				<img

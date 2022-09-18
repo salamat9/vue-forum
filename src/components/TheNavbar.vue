@@ -1,15 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 
-const authUser = ref(null);
-
-onMounted(async () => {
-	authUser.value = await store.dispatch('fetchUser', {
-		id: store.state.authId,
-	});
+const authUser = computed(() => {
+	const id = store.state.authId;
+	if (id) {
+		return store.dispatch('fetchUser', { id });
+	}
 });
 </script>
 

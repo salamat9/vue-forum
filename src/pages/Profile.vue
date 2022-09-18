@@ -31,7 +31,7 @@ const user = computed(() => store.getters.authUser);
 				</div>
 
 				<hr />
-				<PostList :posts="user.posts" />
+				<PostList :posts="user?.posts" />
 			</div>
 		</div>
 	</div>
