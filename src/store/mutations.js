@@ -6,7 +6,11 @@ export default {
 	},
 
 	setUser(state, user) {
-		state.user = user
+		state.user = user;
+	},
+
+	setAuthUserUnsubscribe(state, unsubscribe) {
+		state.authUserUnsubscribe = unsubscribe;
 	},
 
 	setAuthId(state, id) {

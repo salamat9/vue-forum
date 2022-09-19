@@ -1,11 +1,12 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import UserProfileCard from '@/components/UserProfileCard';
 import UserProfileCardEditor from '@/components/UserProfileCardEditor';
 
 const store = useStore();
 
+const emit = defineEmits(['ready'])
 const props = defineProps({
 	edit: {
 		type: Boolean,
@@ -14,6 +15,9 @@ const props = defineProps({
 });
 
 const user = computed(() => store.getters.authUser);
+onMounted(() => {
+	emit('ready')
+})
 </script>
 
 <template>

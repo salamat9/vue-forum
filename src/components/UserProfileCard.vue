@@ -1,9 +1,16 @@
 <script setup>
+import { onMounted } from 'vue';
+
+const emit = defineEmits(['ready']);
 const props = defineProps({
 	user: {
 		required: true,
 		type: Object,
 	},
+});
+
+onMounted(() => {
+	emit('ready');
 });
 </script>
 
@@ -45,8 +52,8 @@ const props = defineProps({
 		<div class="text-center">
 			<hr />
 			<router-link :to="{ name: 'ProfileEdit' }" class="btn-green btn-small">
-        Edit Profile
-      </router-link>
+				Edit Profile
+			</router-link>
 		</div>
 	</div>
 </template>

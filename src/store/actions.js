@@ -190,7 +190,13 @@ export default {
 	fetchAuthUser: ({ dispatch, commit }) => {
 		const userId = firebase.auth().currentUser?.uid;
 		if (!userId) return;
-		dispatch('fetchItem', { id: userId, resource: 'users' });
+		dispatch('fetchItem', {
+			id: userId,
+			resource: 'users',
+			handleUnsubscribe: unsubscribe => {
+				commit('setAuthUserUnsubscribe', unsubscribe);
+			},
+		});
 		firebase
 			.firestore()
 			.collection('users')
@@ -217,7 +223,7 @@ export default {
 		return Promise.all(ids.map(id => dispatch('fetchItem', { id, resource })));
 	},
 
-	fetchItem({ state, commit }, { id, resource }) {
+	fetchItem({ state, commit }, { id, resource, handleUnsubscribe = null }) {
 		return new Promise(resolve => {
 			const unsubscribe = firebase
 				.firestore()
@@ -228,12 +234,23 @@ export default {
 					commit('setItem', { resource, id, item });
 					resolve(item);
 				});
-			commit('appendUnsubscribe', { unsubscribe });
+			if (handleUnsubscribe) {
+				handleUnsubscribe(unsubscribe);
+			} else {
+				commit('appendUnsubscribe', { unsubscribe });
+			}
 		});
 	},
 
 	async unsubscribeAllSnapshots({ state, commit }) {
 		state.unsubscribes.forEach(unsubscribe => unsubscribe());
 		commit('clearAllUnsubscribes');
+	},
+
+	async unsubscribeAuthUserSnapshot({ state, commit }) {
+		if (state.authUserUnsubscribe) {
+			state.authUserUnsubscribe();
+			commit('setAuthUserUnsubscribe', null);
+		}
 	},
 };

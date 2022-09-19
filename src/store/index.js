@@ -7,6 +7,7 @@ export default createStore({
 	state: {
 		authId: null,
 		user: null,
+		authUserUnsubscribe: null,
 		categories: [],
 		forums: [],
 		threads: [],

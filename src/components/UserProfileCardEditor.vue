@@ -1,11 +1,12 @@
 <script setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 
 const store = useStore();
 const router = useRouter();
 
+const emit = defineEmits(['ready'])
 const props = defineProps({
 	user: {
 		required: true,
@@ -21,13 +22,16 @@ const save = () => {
 };
 
 const cancel = () => {
-  debugger
 	router.push({ name: 'Profile' });
 };
+
+onMounted(() => {
+	emit('ready')
+})
 </script>
 
 <template>
-	<div class="profile-card">
+	<div v-if="user" class="profile-card">
 		<form @submit.prevent="save">
 			<p class="text-center">
 				<img
