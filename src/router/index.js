@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '@/store';
 import { findById } from '@/helpers';
-import sourceData from '@/data.json';
 
 const routes = [
 	{
@@ -38,17 +37,18 @@ const routes = [
 		name: 'ThreadShow',
 		component: () => import('@/pages/ThreadShow'),
 		props: true,
-		// beforeEnter(to, from, next) {
-		// 	const threadExists = findById(sourceData.threads, to.params.id);
-		// 	if (threadExists) return next();
-		// 	else
-		// 		return next({
-		// 			name: 'NotFound',
-		// 			params: { pathMatch: to.path.substring(1).split('/') },
-		// 			query: to.query,
-		// 			hash: to.hash,
-		// 		});
-		// },
+		async beforeEnter(to, from, next) {
+			await store.dispatch('fetchThread', { id: to.params.id });
+			const threadExists = findById(store.state.threads, to.params.id);
+			if (threadExists) return next();
+			else
+				return next({
+					name: 'NotFound',
+					params: { pathMatch: to.path.substring(1).split('/') },
+					query: to.query,
+					hash: to.hash,
+				});
+		},
 	},
 	{
 		path: '/forum/:forumId/thread/create',
@@ -99,7 +99,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from) => {
-	await store.dispatch('initAuthentication')
+	await store.dispatch('initAuthentication');
 	store.dispatch('unsubscribeAllSnapshots');
 	if (to.meta.requiresAuth && !store.state.authId) return { name: 'Home' };
 });
