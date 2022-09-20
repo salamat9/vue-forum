@@ -14,6 +14,9 @@ const routes = [
 		name: 'Profile',
 		component: () => import('@/pages/Profile'),
 		meta: { toTop: true, smoothScroll: true },
+		beforeEnter(to, from) {
+			if (!store.state.authId) return { name: 'Home' };
+		},
 	},
 	{
 		path: '/me/edit',
@@ -71,6 +74,14 @@ const routes = [
 		path: '/signIn',
 		name: 'SignIn',
 		component: () => import('@/pages/SignIn'),
+	},
+	{
+		path: '/logout',
+		name: 'SignOut',
+		async beforeEnter(to, from) {
+			await store.dispatch('signOut');
+			return { name: 'Home' };
+		},
 	},
 	{
 		path: '/:pathMatch(.*)*',

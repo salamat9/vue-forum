@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import UserProfileCard from '@/components/UserProfileCard';
 import UserProfileCardEditor from '@/components/UserProfileCardEditor';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const store = useStore();
 
@@ -18,6 +19,9 @@ const user = computed(() => store.getters.authUser);
 onMounted(() => {
 	emit('ready')
 })
+
+onBeforeRouteLeave
+onBe
 </script>
 
 <template>

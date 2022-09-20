@@ -1,7 +1,7 @@
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 
-const emit = defineEmits(['save', 'cancel']);
+const emit = defineEmits(['save', 'cancel', 'dirty', 'clean']);
 const props = defineProps({
 	title: {
 		type: String,
@@ -22,7 +22,13 @@ const existing = computed(() => {
 	return !!props.title;
 });
 
+watch(form, () => {
+	if (props.title !== form.title || props.text !== form.text) emit('dirty')
+	else emit('clean')
+})
+
 const save = () => {
+	emit('clean')
 	emit('save', { ...form });
 };
 
