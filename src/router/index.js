@@ -19,6 +19,7 @@ const routes = [
 		name: 'ProfileEdit',
 		component: () => import('@/pages/Profile'),
 		props: { edit: true },
+		meta: { requiresAuth: true },
 	},
 	{
 		path: '/category/:id',
@@ -55,12 +56,14 @@ const routes = [
 		name: 'ThreadCreate',
 		component: () => import('@/pages/ThreadCreate'),
 		props: true,
+		meta: { requiresAuth: true },
 	},
 	{
 		path: '/thread/:id/edit',
 		name: 'ThreadEdit',
 		component: () => import('@/pages/ThreadEdit'),
 		props: true,
+		meta: { requiresAuth: true },
 	},
 	{
 		path: '/register',
