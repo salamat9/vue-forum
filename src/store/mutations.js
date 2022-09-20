@@ -13,6 +13,10 @@ export default {
 		state.authUserUnsubscribe = unsubscribe;
 	},
 
+	setAuthObserverUnsubscribe(state, unsubscribe) {
+		state.authObserverUnsubscribe = unsubscribe
+	},
+
 	setAuthId(state, id) {
 		state.authId = id;
 	},

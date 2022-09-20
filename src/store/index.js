@@ -8,6 +8,7 @@ export default createStore({
 		authId: null,
 		user: null,
 		authUserUnsubscribe: null,
+		authObserverUnsubscribe: null,
 		categories: [],
 		forums: [],
 		threads: [],

@@ -2,6 +2,22 @@ import firebase from 'firebase';
 import { findById, docToResource } from '@/helpers';
 
 export default {
+	initAuthentication({ dispatch, commit, state }) {
+		if (state.authObserverUnsubscribe) state.authObserverUnsubscribe();
+		return new Promise(resolve => {
+			const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
+				this.dispatch('unsubscribeAuthUserSnapshot');
+				if (user) {
+					await this.dispatch('fetchAuthUser');
+					resolve(user);
+				} else {
+					resolve(null);
+				}
+			});
+			commit('setAuthObserverUnsubscribe', unsubscribe);
+		});
+	},
+
 	async createPost({ commit, state }, post) {
 		post.userId = state.authId;
 		post.publishedAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -187,10 +203,10 @@ export default {
 		dispatch('fetchItem', { id, resource: 'posts' }),
 	fetchUser: ({ dispatch }, { id }) =>
 		dispatch('fetchItem', { id, resource: 'users' }),
-	fetchAuthUser: ({ dispatch, commit }) => {
+	fetchAuthUser: async ({ dispatch, commit }) => {
 		const userId = firebase.auth().currentUser?.uid;
 		if (!userId) return;
-		dispatch('fetchItem', {
+		await dispatch('fetchItem', {
 			id: userId,
 			resource: 'users',
 			handleUnsubscribe: unsubscribe => {

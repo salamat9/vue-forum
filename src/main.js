@@ -9,12 +9,6 @@ import App from './App.vue';
 import components from '@/components/index';
 
 firebase.initializeApp(firebaseConfig.firebaseConfig);
-firebase.auth().onAuthStateChanged(user => {
-	store.dispatch('unsubscribeAuthUserSnapshot')
-	if (user) {
-		store.dispatch('fetchAuthUser');
-	}
-});
 
 const forumApp = createApp(App);
 
