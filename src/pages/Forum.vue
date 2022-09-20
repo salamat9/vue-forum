@@ -27,6 +27,7 @@ const threads = computed(() => {
 
 onMounted(async () => {
 	const forum = await store.dispatch('fetchForum', { id: props.id });
+	console.log('hmm', forum);
 	const threads = await store.dispatch('fetchThreads', { ids: forum.threads });
 	await store.dispatch('fetchUsers', { ids: threads.map(thread => thread.userId) });
 	ready.value = useAsyncDataStatus()

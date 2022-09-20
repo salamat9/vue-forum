@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import ThreadEditor from '@/components/ThreadEditor';
 import { findById } from '@/helpers';
@@ -18,6 +18,7 @@ const props = defineProps({
 });
 
 const ready = ref(false)
+const formIsDirty = ref(false)
 
 const thread = computed(() => findById(store.state.threads, props.id));
 
@@ -36,8 +37,17 @@ const save = async ({ title, text }) => {
 };
 
 const cancel = () => {
-	router.push({ name: 'Forum', params: { id: props.forumId } });
+	router.push({ name: 'ThreadShow', params: { id: props.id } });
 };
+
+onBeforeRouteLeave(() => {
+	if (formIsDirty.value) {
+		const confirmed = window.confirm(
+			'Are you sure you want to leave? Unsaved changes will be lost!'
+		);
+		if (!confirmed) return false;
+	}
+});
 
 onMounted(async () => {
 	const thread = await store.dispatch('fetchThread', { id: props.id });
@@ -57,6 +67,8 @@ onMounted(async () => {
 			:text="text"
 			@save="save"
 			@cancel="cancel"
+			@dirty="formIsDirty = true"
+			@clean="formIsDirty = false"
 		/>
 	</div>
 </template>
