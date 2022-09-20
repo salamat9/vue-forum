@@ -4,10 +4,12 @@ import { useStore } from 'vuex';
 import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import PostList from '@/components/PostList';
 import PostEditor from '@/components/PostEditor';
+import { useRoute } from 'vue-router';
 
 const store = useStore();
+const route = useRoute();
 
-const emit = defineEmits(['ready'])
+const emit = defineEmits(['ready']);
 const props = defineProps({
 	id: {
 		required: true,
@@ -15,13 +17,13 @@ const props = defineProps({
 	},
 });
 
-const ready = ref(false)
-
+const ready = ref(false);
+const thread = ref(null);
 const newPostText = ref(null);
+const authUser = ref(false);
 
 const threads = computed(() => store.state.threads);
 const posts = computed(() => store.state.posts);
-const thread = ref(null);
 const threadPosts = computed(() =>
 	posts.value.filter(post => post.threadId === props.id)
 );
@@ -39,13 +41,12 @@ onMounted(async () => {
 	thread.value.author = await store.dispatch('fetchUser', {
 		id: thread.value.userId,
 	});
-
 	const posts = await store.dispatch('fetchPosts', { ids: thread.value.posts });
 	const users = posts.map(post => post.userId);
 	await store.dispatch('fetchUsers', { ids: users });
-
-	ready.value = useAsyncDataStatus()
-	emit('ready')
+	authUser.value = store.state.user;
+	ready.value = useAsyncDataStatus();
+	emit('ready');
 });
 </script>
 
@@ -54,6 +55,7 @@ onMounted(async () => {
 		<h1>
 			{{ thread?.title }}
 			<router-link
+				v-if="thread.userId === authUser?.id"
 				:to="{ name: 'ThreadEdit', id: this.id }"
 				class="btn-green btn-small"
 				tag="button"
@@ -72,6 +74,16 @@ onMounted(async () => {
 			>
 		</p>
 		<PostList :posts="threadPosts" />
-		<PostEditor @save="addPost" />
+		<PostEditor v-if="authUser" @save="addPost" />
+		<div v-else class="text-center" style="margin-bottom: 50px">
+			<router-link :to="{ name: 'SignIn', query: { redirectTo: route.path } }"
+				>SignIn</router-link
+			>
+			or
+			<router-link :to="{ name: 'Register', query: { redirectTo: route.path } }"
+				>Register</router-link
+			>
+			to reply.
+		</div>
 	</div>
 </template>

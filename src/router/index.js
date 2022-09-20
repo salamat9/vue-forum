@@ -69,11 +69,13 @@ const routes = [
 		path: '/register',
 		name: 'Register',
 		component: () => import('@/pages/Register'),
+		meta: { requiresGuest: true },
 	},
 	{
 		path: '/signIn',
 		name: 'SignIn',
 		component: () => import('@/pages/SignIn'),
+		meta: { requiresGuest: true },
 	},
 	{
 		path: '/logout',
@@ -104,7 +106,9 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
 	await store.dispatch('initAuthentication');
 	store.dispatch('unsubscribeAllSnapshots');
-	if (to.meta.requiresAuth && !store.state.authId) return { name: 'Home' };
+	if (to.meta.requiresAuth && !store.state.authId)
+		return { name: 'SignIn', query: { redirectTo: to.path } };
+	if (to.meta.requiresGuest && store.state.authId) return { name: 'Home' };
 });
 
 export default router;
