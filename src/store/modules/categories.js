@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import { makeFetchItemAction, makeFetchItemsAction } from '@/helpers';
 
 export default {
 	namespaced: true,
@@ -7,11 +8,9 @@ export default {
 	},
 	getters: {},
 	actions: {
-		fetchCategory: ({ dispatch }, { id }) =>
-			dispatch('fetchItem', { id, resource: 'categories' }, { root: true }),
+		fetchCategory: makeFetchItemAction({ resource: 'categories' }),
 
-		fetchCategories: ({ dispatch }, { ids }) =>
-			dispatch('fetchItems', { resource: 'categories', ids }, { root: true }),
+		fetchCategories: makeFetchItemsAction({ resource: 'categories' }),
 
 		fetchAllCategories({ commit }) {
 			return new Promise(resolve => {
@@ -21,7 +20,11 @@ export default {
 					.onSnapshot(querySnapshot => {
 						const categories = querySnapshot.docs.map(doc => {
 							const item = { id: doc.id, ...doc.data() };
-							commit('setItem', { resource: 'categories', item }, {root:true});
+							commit(
+								'setItem',
+								{ resource: 'categories', item },
+								{ root: true }
+							);
 							return item;
 						});
 						resolve(categories);

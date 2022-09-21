@@ -1,19 +1,24 @@
 import firebase from 'firebase';
 import { findById, docToResource } from '@/helpers';
 
-export default {	
-
+export default {
 	fetchItems({ dispatch }, { ids, resource }) {
 		return Promise.all(ids.map(id => dispatch('fetchItem', { id, resource })));
 	},
 
-	fetchItem({ state, commit }, { id, resource, handleUnsubscribe = null }) {
+	fetchItem(
+		{ state, commit },
+		{ id, resource, handleUnsubscribe = null, once = false }
+	) {
 		return new Promise(resolve => {
 			const unsubscribe = firebase
 				.firestore()
 				.collection(resource)
 				.doc(id)
 				.onSnapshot(doc => {
+					if (once) {
+						unsubscribe();
+					}
 					if (doc.exists) {
 						const item = { ...doc.data(), id: doc.id };
 						commit('setItem', { resource, id, item });
@@ -34,6 +39,4 @@ export default {
 		state.unsubscribes.forEach(unsubscribe => unsubscribe());
 		commit('clearAllUnsubscribes');
 	},
-
-	
 };

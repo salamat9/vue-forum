@@ -3,6 +3,8 @@ import {
 	docToResource,
 	makeAppendChildToParentMutation,
 	findById,
+	makeFetchItemAction,
+	makeFetchItemsAction,
 } from '@/helpers';
 
 export default {
@@ -18,7 +20,9 @@ export default {
 				return {
 					...user,
 					get posts() {
-						return rootState.posts.items.filter(post => post.userId === user.id);
+						return rootState.posts.items.filter(
+							post => post.userId === user.id
+						);
 					},
 					get postsCount() {
 						const count = user.postsCount || 0;
@@ -26,7 +30,9 @@ export default {
 						return `${count} posts`;
 					},
 					get threads() {
-						return rootState.threads.items.filter(post => post.userId === user.id);
+						return rootState.threads.items.filter(
+							post => post.userId === user.id
+						);
 					},
 					get threadsCount() {
 						const count = user.threads?.length || 0;
@@ -70,10 +76,8 @@ export default {
 			await userRef.update(updates);
 			commit('setItem', { resource: 'users', item: user }, { root: true });
 		},
-		fetchUser: ({ dispatch }, { id }) =>
-			dispatch('fetchItem', { id, resource: 'users' }, { root: true }),
-		fetchUsers: ({ dispatch }, { ids }) =>
-			dispatch('fetchItems', { resource: 'users', ids }, { root: true }),
+		fetchUser: makeFetchItemAction({ resource: 'users' }),
+		fetchUsers: makeFetchItemsAction({ resource: 'users' }),
 	},
 	mutations: {
 		appendThreadToUser: makeAppendChildToParentMutation({

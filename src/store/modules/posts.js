@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import { makeFetchItemAction, makeFetchItemsAction } from '@/helpers';
 
 export default {
 	namespaced: true,
@@ -24,7 +25,9 @@ export default {
 			batch.set(postRef, post);
 			batch.update(threadRef, {
 				posts: firebase.firestore.FieldValue.arrayUnion(postRef.id),
-				contributors: firebase.firestore.FieldValue.arrayUnion(rootState.auth.authId),
+				contributors: firebase.firestore.FieldValue.arrayUnion(
+					rootState.auth.authId
+				),
 			});
 			batch.update(userRef, {
 				postsCount: firebase.firestore.FieldValue.increment(1),
@@ -69,12 +72,14 @@ export default {
 			const postRef = firebase.firestore().collection('posts').doc(id);
 			await postRef.update(post);
 			const updatedPost = await postRef.get();
-			commit('setItem', { resource: 'posts', item: updatedPost }, {root:true});
+			commit(
+				'setItem',
+				{ resource: 'posts', item: updatedPost },
+				{ root: true }
+			);
 		},
-		fetchPost: ({ dispatch }, { id }) =>
-			dispatch('fetchItem', { id, resource: 'posts' }, {root:true}),
-		fetchPosts: ({ dispatch }, { ids }) =>
-			dispatch('fetchItems', { resource: 'posts', ids }, {root:true}),
+		fetchPost: makeFetchItemAction({ resource: 'posts' }),
+		fetchPosts: makeFetchItemsAction({ resource: 'posts' }),
 	},
 	mutations: {},
 };
