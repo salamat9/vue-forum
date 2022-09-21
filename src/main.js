@@ -3,10 +3,11 @@ import router from '@/router';
 import store from '@/store';
 import firebase from 'firebase';
 import firebaseConfig from '@/config/firebase';
-import FontAwesome from '@/plugins/FontAwesome'
+import FontAwesome from '@/plugins/FontAwesome';
 import './style.css';
 import App from './App.vue';
 import components from '@/components/index';
+import ClickOutsideDirective from '@/plugins/ClickOutsideDirective';
 
 firebase.initializeApp(firebaseConfig.firebaseConfig);
 
@@ -18,5 +19,6 @@ components.forEach(c => {
 
 forumApp.use(router);
 forumApp.use(store);
-forumApp.use(FontAwesome)
+forumApp.use(FontAwesome);
+forumApp.use(ClickOutsideDirective);
 forumApp.mount('#app');
