@@ -4,6 +4,7 @@ import {
 	makeAppendChildToParentMutation,
 } from '@/helpers';
 import firebase from 'firebase';
+import chunk from 'lodash/chunk';
 
 export default {
 	namespaced: true,
@@ -31,7 +32,10 @@ export default {
 		},
 	},
 	actions: {
-		async createThread({ commit, state, dispatch, rootState }, { title, text, forumId }) {
+		async createThread(
+			{ commit, state, dispatch, rootState },
+			{ title, text, forumId }
+		) {
 			const userId = rootState.auth.authId;
 			const publishedAt = firebase.firestore.FieldValue.serverTimestamp();
 
@@ -50,7 +54,7 @@ export default {
 			});
 			await batch.commit();
 			const newThread = await threadRef.get();
-			
+
 			commit(
 				'setItem',
 				{
@@ -58,7 +62,7 @@ export default {
 					item: { ...newThread.data(), id: newThread.id },
 				},
 				{ root: true }
-				);
+			);
 			commit(
 				'users/appendThreadToUser',
 				{ parentId: userId, childId: threadRef.id },
@@ -107,6 +111,12 @@ export default {
 
 		fetchThreads: ({ dispatch }, { ids }) =>
 			dispatch('fetchItems', { resource: 'threads', ids }, { root: true }),
+		fetchThreadsByPage: ({ dispatch, commit }, { ids, page, perPage = 10 }) => {
+			commit('clearThreads')
+			const chunks = chunk(ids, perPage);
+			const limitedIds = chunks[page - 1];
+			return dispatch('fetchThreads', { ids: limitedIds });
+		},
 	},
 	mutations: {
 		appendPostToThread: makeAppendChildToParentMutation({
@@ -117,5 +127,8 @@ export default {
 			parent: 'thread',
 			child: 'contributors',
 		}),
+		clearThreads(state) {
+			state.items = []
+		}
 	},
 };
