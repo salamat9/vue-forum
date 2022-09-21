@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
+import difference from 'lodash/difference';
 import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import useNotifications from '@/composables/useNotification';
 import PostList from '@/components/PostList';
@@ -39,16 +40,37 @@ const addPost = eventData => {
 	store.dispatch('posts/createPost', post);
 };
 
+const fetchPostWithUsers = async ids => {
+	const posts = await store.dispatch('posts/fetchPosts', {
+		ids: ids,
+		onSnapshot: ({ isLocal, previousItem }) => {
+			if (
+				ready.value ||
+				isLocal ||
+				(previousItem?.edited && !previousItem?.edited?.at)
+			)
+				return;
+			addNotification({ message: 'Thread recently updated', timeout: 5000 });
+		},
+	});
+	const users = posts.map(post => post.userId).concat(thread.value.userId);
+	await store.dispatch('users/fetchUsers', { ids: users });
+};
+
 onMounted(async () => {
-	thread.value = await store.dispatch('threads/fetchThread', { id: props.id });
+	thread.value = await store.dispatch('threads/fetchThread', {
+		id: props.id,
+		onSnapshot: ({ isLocal, item, previousItem }) => {
+			if (!ready.value || isLocal) return;
+			const newPosts = difference(item.posts, previousItem.posts);
+			fetchPostWithUsers(newPosts);
+			addNotification({ message: 'Thread recently updated', timeout: 5000 });
+		},
+	});
 	thread.value.author = await store.dispatch('users/fetchUser', {
 		id: thread.value.userId,
 	});
-	const posts = await store.dispatch('posts/fetchPosts', {
-		ids: thread.value.posts,
-	});
-	const users = posts.map(post => post.userId);
-	await store.dispatch('users/fetchUsers', { ids: users });
+	fetchPostWithUsers(thread.value.posts);
 	authUser.value = store.state.auth.user;
 	ready.value = useAsyncDataStatus();
 	emit('ready');
