@@ -4,6 +4,7 @@ import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 import NProgress from 'nprogress';
 import TheNavbar from '@/components/TheNavbar';
+import AppNotifications from '@/components/AppNotifications';
 
 const store = useStore();
 const router = useRouter();
@@ -35,6 +36,7 @@ const onPageReady = () => {
 		<router-view v-show="showPage" @ready="onPageReady" :key="`${route.path}${JSON.stringify($route.query)}`" />
 		<AppSpinner v-show="!showPage" />
 	</div>
+	<AppNotifications />
 </template>
 
 <style>

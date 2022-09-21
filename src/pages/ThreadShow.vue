@@ -1,13 +1,16 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
+import useNotifications from '@/composables/useNotification';
 import PostList from '@/components/PostList';
 import PostEditor from '@/components/PostEditor';
-import { useRoute } from 'vue-router';
 
 const store = useStore();
 const route = useRoute();
+
+const { addNotification } = useNotifications();
 
 const emit = defineEmits(['ready']);
 const props = defineProps({
@@ -41,7 +44,9 @@ onMounted(async () => {
 	thread.value.author = await store.dispatch('users/fetchUser', {
 		id: thread.value.userId,
 	});
-	const posts = await store.dispatch('posts/fetchPosts', { ids: thread.value.posts });
+	const posts = await store.dispatch('posts/fetchPosts', {
+		ids: thread.value.posts,
+	});
 	const users = posts.map(post => post.userId);
 	await store.dispatch('users/fetchUsers', { ids: users });
 	authUser.value = store.state.auth.user;
