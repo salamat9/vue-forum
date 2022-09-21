@@ -17,7 +17,7 @@ const props = defineProps({
 const activeUser = reactive({ ...props.user });
 
 const save = () => {
-	store.dispatch('updateUser', { ...activeUser });
+	store.dispatch('users/updateUser', { ...activeUser });
 	router.push({ name: 'Profile' });
 };
 

@@ -17,12 +17,12 @@ const form = reactive({
 });
 
 const register = async () => {
-	await store.dispatch('registerUserWithEmailAndPassword', form);
+	await store.dispatch('auth/registerUserWithEmailAndPassword', form);
 	router.push({ name: 'Home' });
 };
 
 const registerWithGoogle = async () => {
-	await store.dispatch('signInWithGoogle');
+	await store.dispatch('auth/signInWithGoogle');
 	router.push({name: 'Home' });
 };
 onMounted(() => {

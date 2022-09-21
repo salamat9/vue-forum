@@ -11,7 +11,7 @@ const props = defineProps({
 });
 
 const getForumsForCategory = category => {
-	return store.state.forums.filter(f => f.categoryId == category.id);
+	return store.state.forums.items.filter(f => f.categoryId == category.id);
 };
 </script>
 

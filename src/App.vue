@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import NProgress from 'nprogress';
 import TheNavbar from '@/components/TheNavbar';
 
 const store = useStore();
 const router = useRouter();
+const route = useRoute();
 
 const showPage = ref(false);
 
@@ -19,7 +20,7 @@ onMounted(async () => {
 		showPage.value = false;
 		NProgress.start();
 	});
-	await store.dispatch('fetchAuthUser');
+	await store.dispatch('auth/fetchAuthUser');
 });
 
 const onPageReady = () => {
@@ -31,7 +32,7 @@ const onPageReady = () => {
 <template>
 	<TheNavbar />
 	<div class="container">
-		<router-view v-show="showPage" @ready="onPageReady" />
+		<router-view v-show="showPage" @ready="onPageReady" :key="route.path" />
 		<AppSpinner v-show="!showPage" />
 	</div>
 </template>

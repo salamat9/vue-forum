@@ -20,10 +20,10 @@ const props = defineProps({
 const ready = ref(false);
 const formIsDirty = ref(false);
 
-const forum = computed(() => findById(store.state.forums, props.forumId));
+const forum = computed(() => findById(store.state.forums.items, props.forumId));
 
 const save = async ({ title, text }) => {
-	const thread = await store.dispatch('createThread', {
+	const thread = await store.dispatch('threads/createThread', {
 		forumId: props.forumId,
 		title,
 		text,
@@ -45,7 +45,7 @@ onBeforeRouteLeave(() => {
 });
 
 onMounted(async () => {
-	await store.dispatch('fetchForum', { id: props.forumId });
+	await store.dispatch('forums/fetchForum', { id: props.forumId });
 	ready.value = useAsyncDataStatus();
 	emit('ready');
 });

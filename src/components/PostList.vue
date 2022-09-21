@@ -13,16 +13,16 @@ const props = defineProps({
 
 const editing = ref(null);
 
-const users = computed(() => store.state.users);
+const users = computed(() => store.state.users.items);
 
-const userById = userId => store.getters.user(userId);
+const userById = userId => store.getters['users/user'](userId);
 
 const toggleEditMode = id => {
 	editing.value = id === editing.value ? null : id;
 };
 
 const handleUpdate = event => {
-	store.dispatch('updatePost', event.post)
+	store.dispatch('posts/updatePost', event.post)
 	editing.value = null
 }
 </script>
@@ -63,7 +63,7 @@ const handleUpdate = event => {
 					</p>
 				</div>
 				<a
-					v-if="post.userId === store.state.authId"
+					v-if="post.userId === store.state.auth.authId"
 					@click.prevent="toggleEditMode(post.id)"
 					href="#"
 					style="margin-left: auto; padding-left: 10px"

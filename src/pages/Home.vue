@@ -8,15 +8,15 @@ const store = useStore();
 const emit = defineEmits(['ready'])
 
 const categories = computed(() => {
-	return store.state.categories;
+	return store.state.categories.items;
 });
 
 const ready = ref(false)
 
 onBeforeMount(async () => {
-	const categories = await store.dispatch('fetchAllCategories');
+	const categories = await store.dispatch('categories/fetchAllCategories');
 	const forumIds = categories.map(category => category.forums).flat();
-	await store.dispatch('fetchForums', { ids: forumIds });
+	await store.dispatch('forums/fetchForums', { ids: forumIds });
 	ready.value = useAsyncDataStatus()
 	emit('ready')
 });

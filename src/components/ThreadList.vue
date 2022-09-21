@@ -12,8 +12,8 @@ const props = defineProps({
 	},
 });
 
-const posts = computed(() => store.state.posts)
-const users = computed(() => store.state.users)
+const posts = computed(() => store.state.posts.items)
+const users = computed(() => store.state.users.items)
 
 const postById = postId => findById(posts.value, postId)
 const userById = userId => findById(users.value, userId) || {}

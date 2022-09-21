@@ -22,8 +22,8 @@ const thread = ref(null);
 const newPostText = ref(null);
 const authUser = ref(false);
 
-const threads = computed(() => store.state.threads);
-const posts = computed(() => store.state.posts);
+const threads = computed(() => store.state.threads.items);
+const posts = computed(() => store.state.posts.items);
 const threadPosts = computed(() =>
 	posts.value.filter(post => post.threadId === props.id)
 );
@@ -33,18 +33,18 @@ const addPost = eventData => {
 		...eventData.post,
 		threadId: props.id,
 	};
-	store.dispatch('createPost', post);
+	store.dispatch('posts/createPost', post);
 };
 
 onMounted(async () => {
-	thread.value = await store.dispatch('fetchThread', { id: props.id });
-	thread.value.author = await store.dispatch('fetchUser', {
+	thread.value = await store.dispatch('threads/fetchThread', { id: props.id });
+	thread.value.author = await store.dispatch('users/fetchUser', {
 		id: thread.value.userId,
 	});
-	const posts = await store.dispatch('fetchPosts', { ids: thread.value.posts });
+	const posts = await store.dispatch('posts/fetchPosts', { ids: thread.value.posts });
 	const users = posts.map(post => post.userId);
-	await store.dispatch('fetchUsers', { ids: users });
-	authUser.value = store.state.user;
+	await store.dispatch('users/fetchUsers', { ids: users });
+	authUser.value = store.state.auth.user;
 	ready.value = useAsyncDataStatus();
 	emit('ready');
 });

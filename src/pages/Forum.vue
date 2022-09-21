@@ -17,18 +17,18 @@ const props = defineProps({
 const ready = ref(false)
 
 const forum = computed(() => {
-	return findById(store.state.forums, props.id);
+	return findById(store.state.forums.items, props.id);
 });
 
 const threads = computed(() => {
 	if (!forum.value) return [];
-	return forum._value.threads.map(threadId => store.getters.thread(threadId));
+	return forum._value.threads.map(threadId => store.getters['threads/thread'](threadId));
 });
 
 onMounted(async () => {
-	const forum = await store.dispatch('fetchForum', { id: props.id });
-	const threads = await store.dispatch('fetchThreads', { ids: forum.threads });
-	await store.dispatch('fetchUsers', { ids: threads.map(thread => thread.userId) });
+	const forum = await store.dispatch('forums/fetchForum', { id: props.id });
+	const threads = await store.dispatch('threads/fetchThreads', { ids: forum.threads });
+	await store.dispatch('users/fetchUsers', { ids: threads.map(thread => thread.userId) });
 	ready.value = useAsyncDataStatus()
 	emit('ready')
 });

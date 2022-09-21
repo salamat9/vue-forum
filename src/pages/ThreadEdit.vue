@@ -20,15 +20,15 @@ const props = defineProps({
 const ready = ref(false)
 const formIsDirty = ref(false)
 
-const thread = computed(() => findById(store.state.threads, props.id));
+const thread = computed(() => findById(store.state.threads.items, props.id));
 
 const text = computed(() => {
-	const post = findById(store.state.posts, thread._value.posts[0]);
+	const post = findById(store.state.posts.items, thread._value.posts[0]);
 	return post ? post.text : '';
 });
 
 const save = async ({ title, text }) => {
-	const thread = await store.dispatch('updateThread', {
+	const thread = await store.dispatch('threads/updateThread', {
 		id: props.id,
 		title,
 		text,
@@ -50,8 +50,8 @@ onBeforeRouteLeave(() => {
 });
 
 onMounted(async () => {
-	const thread = await store.dispatch('fetchThread', { id: props.id });
-	await store.dispatch('fetchPost', { id: thread.posts[0] });
+	const thread = await store.dispatch('threads/fetchThread', { id: props.id });
+	await store.dispatch('posts/fetchPost', { id: thread.posts[0] });
 	ready.value = useAsyncDataStatus()
 	emit('ready')
 });

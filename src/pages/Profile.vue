@@ -1,4 +1,4 @@
-<script setup>
+ <script setup>
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import UserProfileCard from '@/components/UserProfileCard';
@@ -15,17 +15,15 @@ const props = defineProps({
 	},
 });
 
-const user = computed(() => store.getters.authUser);
-onMounted(() => {
+const user = computed(() => store.getters['auth/authUser']);
+onMounted(async () => {
+	await store.dispatch('auth/fetchAuthUsersPosts')
 	emit('ready')
 })
-
-onBeforeRouteLeave
-onBe
 </script>
 
 <template>
-	<div class="container">
+	<div class="container" style="width: 100%">
 		<div class="flex-grid">
 			<div class="col-3 push-top">
 				<UserProfileCard v-if="!edit" :user="user" />

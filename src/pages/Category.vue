@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useAsyncDataStatus } from '@/composables/asyncDataStatus';
 import { findById } from '@/helpers';
@@ -17,15 +17,15 @@ const props = defineProps({
 const ready = ref(false)
 
 const category = computed(
-	() => findById(store.state.categories, props.id) || {}
+	() => findById(store.state.categories.items, props.id) || {}
 );
 
 const getForumsForCategory = category =>
-	store.state.forums.filter(f => f.categoryId == category.id);
+	store.state.forums.items.filter(f => f.categoryId == category.id);
 
 onMounted(async () => {
-	const category = await store.dispatch('fetchCategory', { id: props.id });
-	await store.dispatch('fetchForums', { ids: category.forums });
+	const category = await store.dispatch('categories/fetchCategory', { id: props.id });
+	await store.dispatch('forums/fetchForums', { ids: category.forums });
 	ready.value = useAsyncDataStatus()
 	emit('ready')
 });
@@ -33,7 +33,7 @@ onMounted(async () => {
 
 <template>
 	<div v-if="ready" class="col-full">
-		<h1>{{ category.name }}</h1>
+		<h1 class="text-center push-top">{{ category.name }}</h1>
 		<ForumList
 			:title="category.name"
 			:forums="getForumsForCategory(category)"
