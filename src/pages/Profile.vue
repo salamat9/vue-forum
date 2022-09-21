@@ -1,4 +1,4 @@
- <script setup>
+<script setup>
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import UserProfileCard from '@/components/UserProfileCard';
@@ -7,7 +7,7 @@ import { onBeforeRouteLeave } from 'vue-router';
 
 const store = useStore();
 
-const emit = defineEmits(['ready'])
+const emit = defineEmits(['ready']);
 const props = defineProps({
 	edit: {
 		type: Boolean,
@@ -16,10 +16,18 @@ const props = defineProps({
 });
 
 const user = computed(() => store.getters['auth/authUser']);
+
+const lastPostFetched = computed(() => {
+	if (user.value.posts.length === 0) return null;
+	return user.value.posts[user.value.posts.length - 1];
+});
+
 onMounted(async () => {
-	await store.dispatch('auth/fetchAuthUsersPosts')
-	emit('ready')
-})
+	await store.dispatch('auth/fetchAuthUsersPosts', {
+		startAfter: lastPostFetched.value,
+	});
+	emit('ready');
+});
 </script>
 
 <template>
@@ -32,7 +40,7 @@ onMounted(async () => {
 
 			<div class="col-7 push-top">
 				<div class="profile-header">
-					<span class="text-lead">{{ user?.username }} recent activity </span>
+					<span class="text-lead">{{ user?.username }} recent activity</span>
 					<a href="#">See only started threads?</a>
 				</div>
 
