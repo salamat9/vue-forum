@@ -8,6 +8,7 @@ import './style.css';
 import App from './App.vue';
 import components from '@/components/index';
 import ClickOutsideDirective from '@/plugins/ClickOutsideDirective';
+import PageScrollDirective from '@/plugins/PageScrollDirective';
 
 firebase.initializeApp(firebaseConfig.firebaseConfig);
 
@@ -21,4 +22,5 @@ forumApp.use(router);
 forumApp.use(store);
 forumApp.use(FontAwesome);
 forumApp.use(ClickOutsideDirective);
+forumApp.use(PageScrollDirective);
 forumApp.mount('#app');

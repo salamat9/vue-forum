@@ -1,13 +1,24 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 const store = useStore();
+const router = useRouter();
 
 const authUser = ref(null);
 const userDropdownOpen = ref(false);
+const mobileNavMenu = ref(false);
+
+const signOut = () => {
+	store.dispatch('auth/signOut');
+	router.push({ name: 'Home' });
+};
 
 onMounted(async () => {
+	router.beforeEach((to, from) => {
+		mobileNavMenu.value = false;
+	});
 	setTimeout(() => {
 		authUser.value = store.state.auth.user;
 	}, 2000);
@@ -15,11 +26,16 @@ onMounted(async () => {
 </script>
 
 <template>
-	<header class="header" id="header">
+	<header
+		class="header"
+		id="header"
+		v-click-outside="() => (mobileNavMenu = false)"
+		v-page-scroll="() => (mobileNavMenu = false)"
+	>
 		<router-link :to="{ name: 'Home' }" class="logo">
 			<img src="../assets/svg/vueschool-logo.svg" />
 		</router-link>
-		<div class="btn-hamburger">
+		<div class="btn-hamburger" @click="mobileNavMenu = !mobileNavMenu">
 			<!-- use .btn-humburger-active to open the menu -->
 			<div class="top bar"></div>
 			<div class="middle bar"></div>
@@ -27,12 +43,12 @@ onMounted(async () => {
 		</div>
 
 		<!-- use .navbar-open to open nav -->
-		<nav class="navbar">
+		<nav class="navbar" :class="{ 'navbar-open': mobileNavMenu }">
 			<ul>
 				<li v-if="authUser" class="navbar-user">
-					<a 
+					<a
 						@click.prevent="userDropdownOpen = !userDropdownOpen"
-						v-click-outside="() => userDropdownOpen = false"
+						v-click-outside="() => (userDropdownOpen = false)"
 					>
 						<img
 							class="avatar-small"
@@ -60,7 +76,7 @@ onMounted(async () => {
 								>
 							</li>
 							<li class="dropdown-menu-item">
-								<a @click.prevent="store.dispatch('auth/signOut')">Sign Out</a>
+								<a @click.prevent="signOut">Sign Out</a>
 							</li>
 						</ul>
 					</div>
@@ -71,6 +87,12 @@ onMounted(async () => {
 				</li>
 				<li v-if="!authUser" class="navbar-item">
 					<router-link :to="{ name: 'Register' }">Register</router-link>
+				</li>
+				<li v-if="authUser" class="navbar-mobile-item">
+					<router-link :to="{ name: 'Profile' }">View profile</router-link>
+				</li>
+				<li v-if="authUser" class="navbar-mobile-item">
+					<a @click.prevent="signOut">Sign Out</a>
 				</li>
 			</ul>
 

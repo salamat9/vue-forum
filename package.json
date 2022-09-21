@@ -16,6 +16,7 @@
     "dayjs": "^1.11.5",
     "firebase": "^8.4.1",
     "firestore-export-import": "^0.14.0",
+    "lodash": "^4.17.21",
     "nprogress": "^0.2.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.4",
