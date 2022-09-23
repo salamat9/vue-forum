@@ -36,6 +36,16 @@ export default {
 			const result = await firebase
 				.auth()
 				.createUserWithEmailAndPassword(email, password);
+			if (avatar) {
+				const storageBucket = firebase
+					.storage()
+					.ref()
+					.child(
+						`uploads/${result.user.uid}/images/${Date.now()}-${avatar.name}`
+					);
+				const snapshot = await storageBucket.put(avatar);
+				avatar = await snapshot.ref.getDownloadURL()
+			}
 			await dispatch(
 				'users/createUser',
 				{
@@ -84,7 +94,11 @@ export default {
 				.limit(10);
 
 			if (startAfter) {
-				const doc = await firebase.firestore().collection('posts').doc(startAfter.id).get()
+				const doc = await firebase
+					.firestore()
+					.collection('posts')
+					.doc(startAfter.id)
+					.get();
 				query = query.startAfter(doc);
 			}
 
