@@ -24,7 +24,7 @@ onBeforeMount(async () => {
 
 <template>
 	<div v-if="ready" class="col-full">
-		<h1 class="push-top text-center">Welcome to the Forum</h1>
+		<h1 class="push-top text-center">Welcome to the meme's forum</h1>
 		<CategoryList :categories="categories" />
 	</div>
 </template>
