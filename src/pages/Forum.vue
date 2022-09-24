@@ -32,7 +32,7 @@ const threads = computed(() => {
 		.map(thread => store.getters['threads/thread'](thread.id));
 });
 
-const threadCount = computed(() => forum.value.threads.length);
+const threadCount = computed(() => forum.value?.threads?.length || 0);
 
 const totalPages = computed(() => {
 	if (!threadCount.value) return 0;
@@ -40,15 +40,6 @@ const totalPages = computed(() => {
 });
 
 watch(page, async () => {
-	// const threads = await store.dispatch('threads/fetchThreadsByPage', {
-	// 	ids: forum.value.threads,
-	// 	page: page.value,
-	// 	perPage: perPage.value,
-	// });
-	// console.log(threads);
-	// await store.dispatch('users/fetchUsers', {
-	// 	ids: threads.map(thread => thread.userId),
-	// });
 	router.push({ query: { page: page.value } });
 });
 

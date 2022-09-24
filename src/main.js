@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import router from '@/router';
 import store from '@/store';
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 import firebaseConfig from '@/config/firebase';
 import FontAwesome from '@/plugins/FontAwesome';
 import './style.css';

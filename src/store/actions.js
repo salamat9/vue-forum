@@ -1,4 +1,4 @@
-import firebase from 'firebase';
+import firebase from '@/helpers/firebase';
 import { findById } from '@/helpers';
 
 export default {
@@ -17,11 +17,11 @@ export default {
 					}
 					if (doc.exists) {
 						const item = { ...doc.data(), id: doc.id };
-						let previousItem = findById(state[resource].items, id)
-						previousItem = previousItem ? { ...previousItem } : null
+						let previousItem = findById(state[resource].items, id);
+						previousItem = previousItem ? { ...previousItem } : null;
 						commit('setItem', { resource, id, item });
 						if (typeof onSnapshot === 'function') {
-							const isLocal = doc.metadata.hasPendingWrites
+							const isLocal = doc.metadata.hasPendingWrites;
 							onSnapshot({ item: { ...item }, previousItem, isLocal });
 						}
 						resolve(item);
@@ -38,11 +38,18 @@ export default {
 	},
 
 	fetchItems({ dispatch }, { ids, resource, onSnapshot = null }) {
-		return Promise.all(ids.map(id => dispatch('fetchItem', { id, resource, onSnapshot })));
+		ids = ids || [];
+		return Promise.all(
+			ids.map(id => dispatch('fetchItem', { id, resource, onSnapshot }))
+		);
 	},
 
 	async unsubscribeAllSnapshots({ state, commit }) {
 		state.unsubscribes.forEach(unsubscribe => unsubscribe());
 		commit('clearAllUnsubscribes');
+	},
+
+	clearItems({ commit }, { modules = [] }) {
+		commit('clearItems', { modules });
 	},
 };

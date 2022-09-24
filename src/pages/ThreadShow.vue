@@ -91,7 +91,7 @@ onMounted(async () => {
 			</router-link>
 		</h1>
 		<p>
-			By <a href="#" class="link-unstyled">{{ thread?.author?.name }}</a
+			By <a href="#" onclick="return false" class="link-unstyled">{{ thread?.author?.name }}</a
 			>, <AppDate v-if="thread" :timestamp="thread?.publishedAt" />.
 			<span
 				style="float: right; margin-top: 2px"

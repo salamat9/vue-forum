@@ -35,7 +35,7 @@ const handleUpdate = event => {
 					{{ userById(post.userId).name }}
 				</a>
 
-				<a href="#">
+				<a href="#" onclick="return false">
 					<img
 						class="avatar-large"
 						:src="userById(post.userId).avatar"
