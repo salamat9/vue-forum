@@ -97,6 +97,7 @@ onMounted(() => {
 						type="file"
 						class="form-input"
 						accept="image/*"
+						required
 					/>
 				</div>
 

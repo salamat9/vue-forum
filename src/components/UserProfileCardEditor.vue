@@ -1,12 +1,13 @@
 <script setup>
-import { onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import AppSpinner from './AppSpinner.vue';
 
 const store = useStore();
 const router = useRouter();
 
-const emit = defineEmits(['ready'])
+const emit = defineEmits(['ready']);
 const props = defineProps({
 	user: {
 		required: true,
@@ -14,7 +15,8 @@ const props = defineProps({
 	},
 });
 
-const activeUser = reactive({ ...props.user });
+const uploadingImage = ref(false);
+let activeUser = reactive({ ...props.user });
 
 const save = () => {
 	store.dispatch('users/updateUser', { ...activeUser });
@@ -25,20 +27,46 @@ const cancel = () => {
 	router.push({ name: 'Profile' });
 };
 
+const handleAvatarUpload = async e => {
+	uploadingImage.value = true;
+	const file = e.target.files[0];
+	const uploadedImage = await store.dispatch('auth/uploadAvatar', { file });
+	activeUser = uploadedImage || this.activeUser.avatar;
+	uploadingImage.value = false;
+};
+
 onMounted(() => {
-	emit('ready')
-})
+	emit('ready');
+});
 </script>
 
 <template>
 	<div v-if="user" class="profile-card">
 		<form @submit.prevent="save">
-			<p class="text-center">
-				<img
-					:src="user.avatar"
-					:alt="`${user.name} profile picture`"
-					class="avatar-xlarge img-update"
-				/>
+			<p class="text-center avatar-edit">
+				<label for="avatar">
+					<img
+						:src="activeUser.avatar"
+						id="avatar-img"
+						:alt="`${user.name} profile picture`"
+						class="avatar-xlarge img-update"
+					/>
+					<div class="avatar-upload-overlay">
+						<AppSpinner v-if="uploadingImage" color="white" />
+						<FA
+							v-else
+							icon="camera"
+							size="3x"
+							:style="{ color: 'white', opacity: '8' }"
+						/>
+					</div>
+					<input
+						v-show="false"
+						id="avatar"
+						type="file"
+						@change="handleAvatarUpload"
+					/>
+				</label>
 			</p>
 
 			<div class="form-group">
@@ -107,7 +135,9 @@ onMounted(() => {
 			</div>
 
 			<div class="btn-group space-between">
-				<button class="btn-ghost" @click="cancel">Cancel</button>
+				<button type="button" class="btn-ghost" @click.prevent="cancel">
+					Cancel
+				</button>
 				<button type="submit" class="btn-blue">Save</button>
 			</div>
 		</form>

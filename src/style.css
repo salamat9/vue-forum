@@ -2571,3 +2571,14 @@ hr {
     margin-bottom: 5px;
     border-left: 5px solid #263959;
 }
+
+.avatar-edit {
+    position: relative;
+}
+
+.avatar-upload-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
